@@ -9,9 +9,11 @@ const DemoSection: React.FC = () => {
   const [status, setStatus] = useState<'idle' | 'scanning' | 'detected'>('idle');
   const [logs, setLogs] = useState<string[]>([]);
   const [imageSrc, setImageSrc] = useState<string>(LOCAL_PLACEHOLDER);
+  const [showJson, setShowJson] = useState<boolean>(false);
 
   const handleScan = () => {
     setStatus('scanning');
+    setShowJson(false);
     setLogs(['Initializing YOLOv8 model...', 'Connecting to image stream...', 'Processing frame 001...']);
     
     setTimeout(() => {
@@ -23,6 +25,7 @@ const DemoSection: React.FC = () => {
   const reset = () => {
     setStatus('idle');
     setLogs([]);
+    setShowJson(false);
   };
 
   return (
@@ -142,9 +145,18 @@ const DemoSection: React.FC = () => {
 
             {/* Mock JSON Output */}
             {status === 'detected' && (
-              <div className="mt-4 pt-4 border-t border-slate-700">
-                <div className="text-slate-500 mb-2">JSON OUTPUT</div>
-                <pre className="text-[10px] text-blue-300 bg-slate-950 p-3 rounded-lg overflow-x-auto">
+              <div className="mt-3 pt-3 border-t border-slate-700 space-y-2">
+                <div className="flex items-center justify-between text-slate-500 text-[11px]">
+                  <span>JSON OUTPUT</span>
+                  <button
+                    onClick={() => setShowJson(prev => !prev)}
+                    className="text-[11px] text-brand-accent hover:text-white font-semibold transition-colors"
+                  >
+                    {showJson ? 'Hide' : 'Show'}
+                  </button>
+                </div>
+                {showJson && (
+                  <pre className="text-[9px] leading-4 text-blue-300 bg-slate-950 p-2 rounded-lg overflow-x-auto">
 {`{
   "timestamp": "${new Date().toISOString()}",
   "camera_id": "CAM_04",
@@ -157,7 +169,8 @@ const DemoSection: React.FC = () => {
   ],
   "alert_sent": true
 }`}
-                </pre>
+                  </pre>
+                )}
               </div>
             )}
           </div>
