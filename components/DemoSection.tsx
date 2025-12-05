@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Upload, AlertTriangle, CheckCircle, RefreshCw, Terminal, Eye } from 'lucide-react';
 
-// Using a generic street scene. In a real app, this would be user uploaded or a specific CCTV stream.
-const PLACEHOLDER_IMAGE = "https://images.unsplash.com/photo-1572062505559-001099e0df3d?q=80&w=1200&auto=format&fit=crop";
+// Local sample lives in public/demo-images/. If missing, we fall back to the hosted sample.
+const LOCAL_PLACEHOLDER = "/demo-images/Gemini_Generated_Image_njz6xynjz6xynjz6.png";
+const FALLBACK_PLACEHOLDER = "https://images.unsplash.com/photo-1508057198894-247b23fe5ade?auto=format&fit=crop&w=1200&q=80";
 
 const DemoSection: React.FC = () => {
   const [status, setStatus] = useState<'idle' | 'scanning' | 'detected'>('idle');
   const [logs, setLogs] = useState<string[]>([]);
+  const [imageSrc, setImageSrc] = useState<string>(LOCAL_PLACEHOLDER);
 
   const handleScan = () => {
     setStatus('scanning');
@@ -51,8 +53,14 @@ const DemoSection: React.FC = () => {
             <div className="relative w-full h-full flex items-center justify-center bg-slate-900">
                {/* Background Image */}
                <img 
-                  src={PLACEHOLDER_IMAGE} 
+                  src={imageSrc} 
                   alt="CCTV Feed" 
+                  onError={() => {
+                    // If the local file is missing, fall back to the hosted image once.
+                    if (imageSrc !== FALLBACK_PLACEHOLDER) {
+                      setImageSrc(FALLBACK_PLACEHOLDER);
+                    }
+                  }}
                   className={`w-full h-full object-cover transition-opacity duration-500 ${status === 'idle' ? 'opacity-50 grayscale' : 'opacity-80'}`}
                />
 
@@ -86,7 +94,7 @@ const DemoSection: React.FC = () => {
                {status === 'detected' && (
                  <div className="absolute inset-0 z-10 pointer-events-none">
                     {/* Bounding Box for "Gun" */}
-                    <div className="absolute top-[45%] left-[48%] w-[12%] h-[15%] border-2 border-red-500 bg-red-500/20 shadow-[0_0_30px_rgba(239,68,68,0.6)] animate-pulse-fast">
+                    <div className="absolute top-[72%] left-[22%] w-[12%] h-[14%] border-2 border-red-500 bg-red-500/20 shadow-[0_0_30px_rgba(239,68,68,0.6)] animate-pulse-fast">
                       <div className="absolute -top-6 left-0 bg-red-500 text-white text-[10px] font-bold px-2 py-1 uppercase flex items-center gap-1">
                         <AlertTriangle className="w-3 h-3" />
                         Handgun 98%
@@ -94,7 +102,7 @@ const DemoSection: React.FC = () => {
                     </div>
 
                     {/* Person Bounding Box */}
-                    <div className="absolute top-[20%] left-[40%] w-[25%] h-[60%] border border-yellow-500/50 rounded-sm">
+                    <div className="absolute top-[18%] left-[20%] w-[26%] h-[80%] border border-yellow-500/50 rounded-sm">
                        <div className="absolute -top-5 left-0 text-yellow-500 text-[10px] font-mono">Person 99%</div>
                     </div>
                  </div>
